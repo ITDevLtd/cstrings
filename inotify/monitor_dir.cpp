@@ -7,6 +7,25 @@
 #include <string>
 
 static char buffer[1024];
+#define MAP_PAIR(x) { x, #x },
+static std::map<uint32_t, std::string> codes = {
+	MAP_PAIR(IN_ACCESS)
+	MAP_PAIR(IN_ATTRIB)
+	MAP_PAIR(IN_CLOSE_WRITE)
+	MAP_PAIR(IN_CLOSE_NOWRITE)
+	MAP_PAIR(IN_CREATE)
+	MAP_PAIR(IN_DELETE)
+	MAP_PAIR(IN_DELETE_SELF)
+	MAP_PAIR(IN_MODIFY)
+	MAP_PAIR(IN_MOVE_SELF)
+	MAP_PAIR(IN_MOVED_FROM)
+	MAP_PAIR(IN_MOVED_TO)
+	MAP_PAIR(IN_OPEN)
+	MAP_PAIR(IN_IGNORED)
+	MAP_PAIR(IN_ISDIR)
+	MAP_PAIR(IN_Q_OVERFLOW)
+	MAP_PAIR(IN_UNMOUNT)
+};
 
 int main(int argc, char *argv[])
 {
@@ -27,27 +46,6 @@ int main(int argc, char *argv[])
 		std::cerr << "Failed to add the directory '" << argv[1] << "' to the watch list" << std::endl;
 		return 1;
 	}
-
-	#define MAP_PAIR(x) { x, #x },
-
-	std::map<uint32_t, std::string> codes = {
-		MAP_PAIR(IN_ACCESS)
-		MAP_PAIR(IN_ATTRIB)
-		MAP_PAIR(IN_CLOSE_WRITE)
-		MAP_PAIR(IN_CLOSE_NOWRITE)
-		MAP_PAIR(IN_CREATE)
-		MAP_PAIR(IN_DELETE)
-		MAP_PAIR(IN_DELETE_SELF)
-		MAP_PAIR(IN_MODIFY)
-		MAP_PAIR(IN_MOVE_SELF)
-		MAP_PAIR(IN_MOVED_FROM)
-		MAP_PAIR(IN_MOVED_TO)
-		MAP_PAIR(IN_OPEN)
-		MAP_PAIR(IN_IGNORED)
-		MAP_PAIR(IN_ISDIR)
-		MAP_PAIR(IN_Q_OVERFLOW)
-		MAP_PAIR(IN_UNMOUNT)
-	};
 
 	while(true)
 	{
