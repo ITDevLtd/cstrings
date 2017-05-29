@@ -142,22 +142,22 @@ int main(int argc, char *argv[])
 
 	if (errno != EINTR)
 	{
-	    if (bytesRead < 0)
-	    {
+		if (bytesRead < 0)
+		{
 			std::cerr << "Error reading inotify file id" << std::endl;
 			std::cerr << "Errno is '" << strerror(errno) << "' (" << errno << ")" << std::endl;
 			failure = 1;
-	    }
-	    else if (static_cast<size_t>(bytesRead) != sizeof(struct inotify_event))
-	    {
-	       std::cerr << "Error reading inotify file id. Unexpected number of bytes" << std::endl;
-	       failure = 1;
-	    }
+		}
+		else if (static_cast<size_t>(bytesRead) != sizeof(struct inotify_event))
+		{
+			std::cerr << "Error reading inotify file id. Unexpected number of bytes" << std::endl;
+			failure = 1;
+		}
 	}
 
-    std::cout << "Ending program..." << std::endl;
-    inotify_rm_watch(inotifyFd, watchDescriptor);
-    close(inotifyFd);
+	std::cout << "Ending program..." << std::endl;
+	inotify_rm_watch(inotifyFd, watchDescriptor);
+	close(inotifyFd);
 
 	return failure;
 }
