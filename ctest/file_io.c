@@ -27,13 +27,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <errno.h>
 
 #include "file_io.h"
 
 #define LINE_BUF_SIZE_BYTES 256
 
+static bool buffer_contains_newline(const char *const buffer)
+{
+	return strchr(buffer, (int)'\n') != NULL;
+}
+
 int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size)
 {
+	int error_number;
 	char *result;
 	char *line_buff;
 	char *buff_pos;
@@ -45,7 +53,7 @@ int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size)
 	size_t block_size;
 
 	if (!buffer || !usr_buff_size) {
-		return -1;
+		return -EINVAL;
 	}
 
 	if (feof(fhnd)) {
@@ -55,8 +63,9 @@ int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size)
 	if (!*buffer) {
 		line_buff = malloc(LINE_BUF_SIZE_BYTES);
 		if (!line_buff) {
-			return -1;
+			return -ENOMEM;
 		}
+
 		buff_size = LINE_BUF_SIZE_BYTES;
 		block_size = LINE_BUF_SIZE_BYTES;
 	}
@@ -87,16 +96,13 @@ int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size)
 			break;
 		}
 
-		/* Find out if we read in a newline. Search through the string until
-		 * the null byte. If a newline is found before that, then we have 
-		 * completed a line, otherwise we need to enlarge our buffer */
-		result = strchr(buff_pos, (int)'\n');
-		if (!result) {
-			/* No newline terminator found and no eof so buffer will be full */
+		if (!buffer_contains_newline(buff_pos)) {
+			/* No newline terminator found and no eof so buffer will be full - must resize so we
+			 * can continue to read in this line */
 			char *tmp_buff_ptr = realloc(line_buff, buff_size + LINE_BUF_SIZE_BYTES);
-			if (!tmp_buff_ptr) {
+			if (!tmp_buff_ptr)
 				goto _error;
-			}
+
 			line_buff  = tmp_buff_ptr;
 			buff_pos   = line_buff + buff_size - 1u;
 			buff_size += LINE_BUF_SIZE_BYTES;
@@ -112,17 +118,18 @@ int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size)
 	return 1;
 
 _error:
-	if (!*buffer)
+	error_number = errno;
+
+	if (!*buffer) {
 		/* We allocated the buffer, not the user, so just free it. */
 		free(line_buff);
-	else 
+	}
+	else  {
 		/* The user allocated the buffer so return a pointer to the last 
 		 * properly realloc()'ed buffer (not updated in the loop to save the
 		 * extra write */
 		*buffer = line_buff;
+	}
 
-	return -1;
+	return error_number;
 }
-
-
-

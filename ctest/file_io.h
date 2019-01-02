@@ -26,6 +26,12 @@
 #ifndef __JEHTECH_FILE_IO_H__
 #define __JEHTECH_FILE_IO_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stdio.h>
+
 /*
  * @brief Reads a file line at a time
  *
@@ -58,8 +64,18 @@
  *                      @p buffer. Note that this may be larger than the
  *                      original buffer if the line length read from the file
  *                      required more memory.
+ *
+ * @return negative value on error, 0 when there are no newlines be read, 1 on
+ *         success but when there are potentially more lines to be read. Thus
+ *         the function can be read until 0 is returned.
+ *
+ * @todo buffer size can currently grow to an unrestrained size. may want to
+ *       be able to specify a limit.
  */
 int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __JEHTECH_FILE_IO_H__ */
