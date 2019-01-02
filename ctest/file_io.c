@@ -1,4 +1,4 @@
-/* Copyright (c) 2016, 
+/* Copyright (c) 2018, James Hume
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
