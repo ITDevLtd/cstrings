@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include "gtest/gtest.h"
 
-#include "file_io.h"
+#include "get_line.h"
 
 TEST(TestReadLine, AutoBufferAllocationFileRead)
 {

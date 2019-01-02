@@ -1,15 +1,17 @@
+CFLAGS+=-fPIC
+CXXFLAGS+=-fPIC
+LDLIBS+=-lgtest -lgtest_main -lpthread
+LDFLAGS+=-L/usr/lib/
+
+test_get_line: test_get_line.o get_line.o
+	$(LINK.cpp) $^ $(LDLIBS) -o $@
+
+get_line.o: get_line.h
+
 .PHONY: all
-all: test_file_io
+all: test_get_line
 
 .PHONY: clean
 clean:
-	@$(RM) *.o test_file_io
+	@$(RM) *.o test_get_line
 
-test_file_io: CFLAGS+=-fPIC
-test_file_io: CXXFLAGS+=-fPIC
-test_file_io: LDLIBS+=-lgtest -lgtest_main -lpthread
-test_file_io: LDFLAGS+=-L/usr/lib/
-test_file_io: test_file_io.o file_io.o
-	$(LINK.cpp) $^ $(LDLIBS) -o $@
-
-file_io.o: file_io.h

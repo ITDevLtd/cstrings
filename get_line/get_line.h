@@ -23,8 +23,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __JEHTECH_FILE_IO_H__
-#define __JEHTECH_FILE_IO_H__
+#ifndef __JEHTECH_GET_LINE_H__
+#define __JEHTECH_GET_LINE_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,4 +78,4 @@ int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size);
 }
 #endif
 
-#endif /* __JEHTECH_FILE_IO_H__ */
+#endif /* __JEHTECH_GET_LINE_H__ */

@@ -30,7 +30,7 @@
 #include <stdbool.h>
 #include <errno.h>
 
-#include "file_io.h"
+#include "get_line.h"
 
 #define LINE_BUF_SIZE_BYTES 256
 
