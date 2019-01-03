@@ -1,26 +1,26 @@
 /* Copyright (c) 2018, James Hume
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * * Redistributions of source code must retain the above copyright notice, this
  *   list of conditions and the following disclaimer.
- * 
+ *
  * * Redistributions in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 #include <stdlib.h>
@@ -39,7 +39,7 @@ static bool buffer_contains_newline(const char *const buffer)
 	return strchr(buffer, (int)'\n') != NULL;
 }
 
-int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size)
+int read_line(FILE *const fhnd, char **const buffer, size_t *const usr_buff_size)
 {
 	int error_number;
 	char *result;
@@ -57,9 +57,10 @@ int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size)
 	}
 
 	if (feof(fhnd)) {
+		**buffer = '\0';
 		return 0;
 	}
-	
+
 	if (!*buffer) {
 		line_buff = malloc(LINE_BUF_SIZE_BYTES);
 		if (!line_buff) {
@@ -77,7 +78,7 @@ int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size)
 
 	buff_pos = line_buff;
 
-	while (1) 
+	while (1)
 	{
 		result = fgets(buff_pos, block_size, fhnd);
 		if (!result) {
@@ -85,11 +86,7 @@ int read_line(FILE *fhnd, char **buffer, size_t *usr_buff_size)
 			if (ferror(fhnd)) {
 				goto _error;
 			}
-			else {
-				/* If we read no bytes because we immediately hit EOF, make sure
-				 * the buffer starts with a NULL terminating byte */
-				line_buff[0] = '\0';
-			}
+			/* else: covered by check for feof() at start of function */
 		}
 
 		if (feof(fhnd)) {

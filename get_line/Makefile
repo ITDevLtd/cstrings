@@ -1,5 +1,5 @@
 CFLAGS+=-fPIC
-CXXFLAGS+=-fPIC
+CXXFLAGS+=-fPIC -std=c++11
 LDLIBS+=-lgtest -lgtest_main -lpthread
 LDFLAGS+=-L/usr/lib/
 
