@@ -193,7 +193,7 @@ const char *ReadLineTest::m_large_file_expected_lines[NUM_LINES] = {
 
 TEST_F(ReadLineTest, AutoBufferAllocationFileRead)
 {
-    OpenManagedFileFromStaticMemoryBuffer(m_basic_file_contents, strlen(m_basic_file_contents) + 1);
+    OpenManagedFileFromStaticMemoryBuffer(m_basic_file_contents, strlen(m_basic_file_contents));
     RequestThatReadLineAllocatesLineBufferForUser();
     TestBasicFileContentsRead();
 }
@@ -229,7 +229,6 @@ TEST_F(ReadLineTest, LargeBuffer)
         ResultIs(0),
         BufferContentIs(""),
         BufferSizeIsGreaterThan(max_line_size_so_far - 1));
-
 }
 
 int main(int argc, char *argv[])
