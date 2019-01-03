@@ -1,68 +1,141 @@
 #include <cstdlib>
 #include "gtest/gtest.h"
-
 #include "get_line.h"
 
-TEST(TestReadLine, AutoBufferAllocationFileRead)
+class ReadLineTest : public testing::Test {
+protected:
+
+    virtual void SetUp() override
+    {
+        m_file_handle = nullptr;
+        m_buffer = nullptr;
+        m_buffer_size = 0;
+    }
+
+    virtual void TearDown() override
+    {
+        if (m_file_handle)
+            fclose(m_file_handle);
+
+        free(m_buffer);
+    }
+    
+    void OpenFileFromStaticMemoryBuffer(char *file_memory_buffer, const size_t file_memory_buffer_size)
+    {
+        ASSERT_NE(file_memory_buffer, nullptr);
+        ASSERT_NE(file_memory_buffer_size, 0);
+        OpenFileFromAllocatedMemoryBuffer(strncpy(file_memory_buffer, file_memory_buffer_size), file_memory_buffer_size);
+    }
+
+    void OpenFileFromAllocatedMemoryBuffer(char *file_memory_buffer, const size_t file_memory_buffer_size)
+    {
+        ASSERT_NE(file_memory_buffer, nullptr);
+        ASSERT_NE(file_memory_buffer_size, 0);
+        m_buffer = file_memory_buffer;
+        m_buffer_size = file_memory_buffer_size;
+        m_file_handle = fmemopen(m_buffer, m_buffer_size, "r");
+        ASSERT_NE(m_file_handle, nullptr);
+    }
+
+    inline int ResultIs(const int value)
+    {
+        return value;
+    }
+
+    inline char *BufferContentIs(char *const buffer)
+    {
+        return buffer;
+    }
+
+    inline size_t BufferSizeIsGreaterThan(const size_t buffer_size)
+    {
+        return buffer_size;
+    }
+
+    void RequestThatReadLineAllocatesLineBufferForUser()
+    {
+        if (m_buffer) {
+            free(m_buffer);
+        }
+        m_buffer = nullptr;
+        m_buffer_size = 0;
+    }
+
+    void ProvideReadLineWithUserAllocatedBuffer(const size_t buffer_size)
+    {
+        if (m_buffer) {
+            free(m_buffer);
+        }
+        m_buffer = (char *)malloc(buffer_size);
+        ASSERT_NE(m_buffer, nullptr);
+        m_buffer_size = buffer_size;
+    }
+
+    int CallReadLineAndCheck(const int expected_result, char *const expected_buffer, const size_t exected_buffer_size)
+    {
+        const int result = read_line(m_file_handle, &m_buffer, &m_buffer_size);
+        EXPECT_EQ(result, exected_result);
+        if (exected_buffer) {
+            EXPECT_NE(m_buffer, nullptr);
+            EXPECT_STREQ(m_buffer, exected_buffer);
+        }
+        else {
+            EXPECT_EQ(m_buffer, nullptr);
+        }
+        EXPECT_GT(m_buffer_size, exected_buffer_size);
+    }
+
+    FILE *m_file_handle;
+    char *m_buffer;
+    size_t m_buffer_size;
+
+    static const char m_basic_file_contents[];
+};
+
+const char ReadLineTest::m_basic_file_contents[] = "This is a test\nfile with 2 lines.";
+
+TEST_F(ReadLineTest, AutoBufferAllocationFileRead)
 {
-	static char file_memory_buffer[] = "This is a test\nfile with 2 lines.";
+    OpenFileFromStaticMemoryBuffer(m_basic_file_contents, strlen(m_basic_file_contents));
 
-	FILE *const fh = fmemopen(file_memory_buffer, sizeof(file_memory_buffer), "r");
-	ASSERT_NE(fh, nullptr);
+    RequestThatReadLineAllocatesLineBufferForUser();
 
-	char *buffer = nullptr;
-	size_t buffer_size;
-	int result = read_line(fh, &buffer, &buffer_size);
-	EXPECT_EQ(result, 1);
-	EXPECT_NE(buffer, nullptr);
-	EXPECT_GT(buffer_size, 0);
-	EXPECT_STREQ(buffer,"This is a test\n");
+    CallReadLineAndCheck(
+        ResultIs(1),
+        BufferContentsIs("This is a test\n"),
+        BufferSizeIsGreaterThan(14));
 
-	result = read_line(fh, &buffer, &buffer_size);
-	EXPECT_EQ(result, 1);
-	EXPECT_NE(buffer, nullptr);
-	EXPECT_GT(buffer_size, 0);
-	EXPECT_STREQ(buffer,"file with 2 lines.");
+    CallReadLineAndCheck(
+        ResultIs(1),
+        BufferContentsIs("file with 2 lines."),
+        BufferSizeIsGreaterThan(17));
 
-	result = read_line(fh, &buffer, &buffer_size);
-	EXPECT_EQ(result, 0);
-	EXPECT_NE(buffer, nullptr);
-	EXPECT_GT(buffer_size, 0);
-
-	free(buffer);
-	fclose(fh);
+    CallReadLineAndCheck(
+        ResultIs(0),
+        BufferContentsIs(""),
+        BufferSizeIsGreaterThan(17));
 }
 
 TEST(TestReadLine, SmallUserDefinedBufferResizedFileRead)
 {
-	static char file_memory_buffer[] = "This is a test\nfile with 2 lines.";
+    OpenFileFromStaticMemoryBuffer(m_basic_file_contents, strlen(m_basic_file_contents));
 
-	FILE *const fh = fmemopen(file_memory_buffer, sizeof(file_memory_buffer), "r");
-	ASSERT_NE(fh, nullptr);
+    ProvideReadLineWithUserAllocatedBuffer(10);
 
-	size_t buffer_size = 10;
-	char *buffer = (char *)malloc(buffer_size);
-	int result = read_line(fh, &buffer, &buffer_size);
-	EXPECT_EQ(result, 1);
-	EXPECT_NE(buffer, nullptr);
-	EXPECT_GT(buffer_size, 10);
-	EXPECT_STREQ(buffer,"This is a test\n");
+    CallReadLineAndCheck(
+        ResultIs(1),
+        BufferContentsIs("This is a test\n"),
+        BufferSizeIsGreaterThan(14));
 
-	const size_t buffer_size_previous = buffer_size;
-	result = read_line(fh, &buffer, &buffer_size);
-	EXPECT_EQ(result, 1);
-	EXPECT_NE(buffer, nullptr);
-	EXPECT_EQ(buffer_size, buffer_size_previous);
-	EXPECT_STREQ(buffer,"file with 2 lines.");
+    CallReadLineAndCheck(
+        ResultIs(1),
+        BufferContentsIs("file with 2 lines."),
+        BufferSizeIsGreaterThan(17));
 
-	result = read_line(fh, &buffer, &buffer_size);
-	EXPECT_EQ(result, 0);
-	EXPECT_NE(buffer, nullptr);
-	EXPECT_EQ(buffer_size, buffer_size_previous);
-
-	free(buffer);
-	fclose(fh);
-
+    CallReadLineAndCheck(
+        ResultIs(0),
+        BufferContentsIs(""),
+        BufferSizeIsGreaterThan(17));
 }
 
 #define LINE0 "A test.\n"

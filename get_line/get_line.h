@@ -42,6 +42,9 @@ extern "C" {
  * RESPONSIBILITY TO FREE THE LINE BUFFER once it is no longer needed (buffer
  * always returned via the parameter @c buffer).
  *
+ * @note Because the buffer can be resized by this function it must always be
+ *       a buffer that has been malloc()'ed. Thus, it cannot be char array.
+ *
  * @param fhnd   The @c FILE handle of the file to be read
  * @param buffer Must never be @c NULL. If @p *buffer is @c NULL, a new buffer
  *               will be allocated automatically and returned via @p *buffer.
