@@ -80,7 +80,7 @@ int read_line(FILE *const fhnd, char **const buffer, size_t *const usr_buff_size
 
 	while (1)
 	{
-		result = fgets(buff_pos, block_size, fhnd);
+		result = fgets(buff_pos, (int)block_size, fhnd);
 		if (!result) {
 			/* NULL means error or feof with zero chars read. */
 			if (ferror(fhnd)) {
