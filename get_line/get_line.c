@@ -57,7 +57,9 @@ int read_line(FILE *const fhnd, char **const buffer, size_t *const usr_buff_size
 	}
 
 	if (feof(fhnd)) {
-		**buffer = '\0';
+		if (*buffer) {
+			**buffer = '\0';
+		}
 		return 0;
 	}
 
