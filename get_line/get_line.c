@@ -66,6 +66,7 @@ int read_line(FILE *const fhnd, char **const buffer, size_t *const usr_buff_size
 		if (!line_buff) {
 			return -ENOMEM;
 		}
+		line_buff[0] = '\0';
 
 		buff_size = LINE_BUF_SIZE_BYTES;
 		block_size = LINE_BUF_SIZE_BYTES;
